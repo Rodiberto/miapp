@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "706675456476",
+    "project_id": "miapp-fc288",
+    "storage_bucket": "miapp-fc288.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706675456476:android:705a7a18ec9e8c1cb67719",
+        "android_client_info": {
+          "package_name": "com.example.miapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDddXkbEhPj8UfP-7PAscx8D0liTNGnBJ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

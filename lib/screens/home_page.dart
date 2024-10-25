@@ -5,6 +5,8 @@ import 'login_page.dart';
 class HomePage extends StatelessWidget {
   final AuthService _authService = AuthService();
 
+  HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

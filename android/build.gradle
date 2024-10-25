@@ -1,11 +1,13 @@
-buildscript {
+allprojects {
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4' // Asegúrate de usar la versión adecuada
-        classpath 'com.google.gms:google-services:4.3.10' // Verifica que esta línea esté aquí
+        classpath 'com.android.tools.build:gradle:8.1.0' // Asegúrate de usar la versión adecuada
+        classpath 'com.google.gms:google-services:4.3.8'
+         // Verifica que esta línea esté aquí
     }
 }
 
@@ -26,4 +28,14 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
+}
+
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == "com.twitterlogin") {
+                project.android.namespace = "com.twitterlogin"
+            }
+        }
+    }
 }

@@ -3,7 +3,7 @@
         android:label="miapp"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true"> <!-- Permite tráfico sin cifrado -->
+        android:usesCleartextTraffic="true"> 
         <activity
             android:name=".MainActivity"
             android:exported="true"

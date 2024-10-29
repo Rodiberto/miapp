@@ -39,6 +39,7 @@ dependencies:
   cloud_firestore: ^5.4.4
   http: ^1.2.2
   url_launcher: ^6.0.20
+  flutter_web_auth: ^0.6.0
   # twitter_login: ^4.4.2
   # flutter_twitter_login: ^2.0.0
 

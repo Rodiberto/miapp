@@ -26,11 +26,9 @@ class _RegisterPageState extends State<RegisterPage> {
       // Si el registro es exitoso, redirigir a la página de inicio de sesión
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => LoginPage()), // Redirigir a LoginPage
+        MaterialPageRoute(builder: (context) => LoginPage()),
       );
     } else {
-      // Maneja el error (por ejemplo, mostrando un Snackbar)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al registrarse. Intenta de nuevo.')),
       );

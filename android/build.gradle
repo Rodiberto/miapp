@@ -1,3 +1,4 @@
+// build.gradle (Root Project)
 plugins {
     id "com.android.application" version "8.1.0" apply false
     id "org.jetbrains.kotlin.android" version "1.8.22" apply false
@@ -8,27 +9,29 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://maven.twitter.com/' }
     }
 }
 
+// Configuración del directorio de construcción
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 
-subprojects {
-    project.evaluationDependsOn(":app")
-}
-
+// Tarea de limpieza
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
 
+// Configuración de namespace
 subprojects {
-    project.configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == "com.twitterlogin") {
-                project.android.namespace = "com.twitterlogin"
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (!namespace) {
+                    namespace = project.group
+                }
             }
         }
     }

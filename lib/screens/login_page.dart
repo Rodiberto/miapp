@@ -1,5 +1,138 @@
+// import 'package:flutter/material.dart';
+// import 'package:twitter_login/twitter_login.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import '../services/auth_service.dart';
+// import 'home_page.dart';
+// import 'register_page.dart';
+
+// class LoginPage extends StatefulWidget {
+//   const LoginPage({super.key});
+
+//   @override
+//   _LoginPageState createState() => _LoginPageState();
+// }
+
+// class _LoginPageState extends State<LoginPage> {
+//   final AuthService _authService = AuthService();
+//   final TextEditingController _emailController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+
+//   void _login() async {
+//     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+//       _showError('Por favor, ingresa tu correo y contraseña');
+//       return;
+//     }
+
+//     var user = await _authService.loginWithEmail(
+//       _emailController.text,
+//       _passwordController.text,
+//     );
+
+//     if (user != null) {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => HomePage()),
+//       );
+//     } else {
+//       _showError('Error al iniciar sesión');
+//     }
+//   }
+
+//   Future<void> _loginWithTwitter() async {
+//     final twitterLogin = TwitterLogin(
+//       apiKey: '09iHxfkbpaMbJil2o3qJAHGNL',
+//       apiSecretKey: '0NWBPEiczvkMRDRnfgUAtK5fiDUhQ0WC0H1vyK9057371gOSpe',
+//       redirectURI: 'https://miapp-fc288.firebaseapp.com/__/auth/handler',
+//     );
+
+//     final authResult = await twitterLogin.login();
+
+//     if (authResult.status == null) {
+//       _showError('Error desconocido de inicio de sesión con Twitter');
+//       return;
+//     }
+
+//     switch (authResult.status) {
+//       case TwitterLoginStatus.loggedIn:
+//         final credential = TwitterAuthProvider.credential(
+//           accessToken: authResult.authToken!,
+//           secret: authResult.authTokenSecret!,
+//         );
+//         UserCredential userCredential =
+//             await FirebaseAuth.instance.signInWithCredential(credential);
+
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(builder: (context) => HomePage()),
+//         );
+//         break;
+
+//       case TwitterLoginStatus.cancelledByUser:
+//         _showError('Inicio de sesión cancelado por el usuario');
+//         break;
+
+//       case TwitterLoginStatus.error:
+//         _showError('Error de inicio de sesión con Twitter');
+//         break;
+
+//       default:
+//         _showError('Error desconocido de inicio de sesión con Twitter');
+//         break;
+//     }
+//   }
+
+//   void _showError(String message) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text(message)),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Iniciar Sesión')),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           children: [
+//             TextField(
+//               controller: _emailController,
+//               decoration: const InputDecoration(labelText: 'Correo'),
+//             ),
+//             TextField(
+//               controller: _passwordController,
+//               decoration: const InputDecoration(labelText: 'Contraseña'),
+//               obscureText: true,
+//             ),
+//             ElevatedButton(
+//               onPressed: _login,
+//               child: const Text('Iniciar Sesión'),
+//             ),
+//             const SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: _loginWithTwitter,
+//               child: const Text('Iniciar Sesión con Twitter'),
+//             ),
+//             const SizedBox(height: 20),
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const RegisterPage()),
+//                 );
+//               },
+//               child: const Text('¿No tienes una cuenta? Regístrate'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:twitter_login/twitter_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'home_page.dart';
 import 'register_page.dart';
@@ -16,97 +149,127 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Método de inicio de sesión con correo y contraseña
+  // Método de autenticación por correo y contraseña
   void _login() async {
-    var user = await _authService.loginWithEmail(
-      _emailController.text,
-      _passwordController.text,
-    );
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _showError('Por favor, ingresa tu correo y contraseña');
+      return;
+    }
 
-    if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+    try {
+      var user = await _authService.loginWithEmail(
+        _emailController.text,
+        _passwordController.text,
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al iniciar sesión')),
-      );
+
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        _showError('Error al iniciar sesión');
+      }
+    } catch (e) {
+      _showError('Error de inicio de sesión: $e');
     }
   }
 
-  // Método para iniciar sesión con Instagram
-  Future<void> _loginWithInstagram() async {
-    const clientId = '431032116699928';
-    const redirectUri = 'https://localhost';
-    const responseType = 'token';
-
-    final authUrl = Uri.https(
-      'api.instagram.com',
-      '/oauth/authorize',
-      {
-        'client_id': clientId,
-        'redirect_uri': redirectUri,
-        'scope': 'user_profile',
-        'response_type': responseType,
-      },
+  // Método de autenticación con Twitter
+  Future<void> _loginWithTwitter() async {
+    final twitterLogin = TwitterLogin(
+      apiKey: '09iHxfkbpaMbJil2o3qJAHGNL',
+      apiSecretKey: '0NWBPEiczvkMRDRnfgUAtK5fiDUhQ0WC0H1vyK9057371gOSpe',
+      redirectURI: 'https://miapp-fc288.firebaseapp.com/__/auth/handler',
     );
 
     try {
-      // Inicia la autenticación y recibe la URL de redirección con el token
-      final result = await FlutterWebAuth.authenticate(
-          url: authUrl.toString(), callbackUrlScheme: "https");
+      final authResult = await twitterLogin.login();
 
-      // Extrae el token de acceso desde la URL de redirección
-      final accessToken = Uri.parse(result).fragment.split("=")[1];
+      if (authResult.status == null) {
+        _showError('Error desconocido de inicio de sesión con Twitter');
+        return;
+      }
 
-      // Ahora puedes usar el token para obtener datos del perfil o redirigir a otra página
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+      switch (authResult.status) {
+        case TwitterLoginStatus.loggedIn:
+          final credential = TwitterAuthProvider.credential(
+            accessToken: authResult.authToken!,
+            secret: authResult.authTokenSecret!,
+          );
+
+          // Intento de inicio de sesión en Firebase con las credenciales de Twitter
+          UserCredential userCredential =
+              await FirebaseAuth.instance.signInWithCredential(credential);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+
+        case TwitterLoginStatus.cancelledByUser:
+          _showError('Inicio de sesión cancelado por el usuario');
+          break;
+
+        case TwitterLoginStatus.error:
+          _showError(
+              'Error de inicio de sesión con Twitter: ${authResult.errorMessage}');
+          break;
+
+        default:
+          _showError('Error desconocido de inicio de sesión con Twitter');
+          break;
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al iniciar sesión con Instagram')),
-      );
+      _showError('Error de autenticación con Twitter: $e');
     }
+  }
+
+  // Método para mostrar errores en pantalla
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Iniciar Sesión')),
+      appBar: AppBar(title: const Text('Iniciar Sesión')),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Correo'),
+              decoration: const InputDecoration(labelText: 'Correo'),
+              keyboardType: TextInputType.emailAddress,
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Contraseña'),
+              decoration: const InputDecoration(labelText: 'Contraseña'),
               obscureText: true,
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _login,
-              child: Text('Iniciar Sesión'),
+              child: const Text('Iniciar Sesión'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _loginWithInstagram,
-              child: Text('Iniciar Sesión con Instagram'),
+              onPressed: _loginWithTwitter,
+              child: const Text('Iniciar Sesión con Twitter'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RegisterPage()),
+                  MaterialPageRoute(builder: (context) => const RegisterPage()),
                 );
               },
-              child: Text('¿No tienes una cuenta? Regístrate'),
+              child: const Text('¿No tienes una cuenta? Regístrate'),
             ),
           ],
         ),
